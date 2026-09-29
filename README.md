@@ -13,9 +13,10 @@
 | Marlon Dias De Sousa | — |
 | Murilo Souza dos Santos | 48108987 |
 | Eduardo Chaves Santos | 48043087 |
-| Guilherme Alves | 48129861 |
-| Paulo Peralta Soto | — |
+| Guilherme Alves Raimundo | 48129861 |
+| Paulo Peralta Soto | 49760432 |
 | Daniel Santana Cavalcante | 47391812 |
+| mateus candia neves coelho | 47390778 |
 
 ---
 
@@ -98,6 +99,87 @@ O DER abaixo reflete o modelo de dados final validado pela equipe, contendo toda
 | RN07 | Compras de matéria-prima passam por cotação entre fornecedores |
 | RN10 | Descontos limitados a 3% (ou até 10% em casos especiais), com autorização do CEO |
 | RN11 | Cancelamentos retêm 5% do valor já pago pelo cliente |
+
+---
+
+## 📖 Dicionário de Dados Conceitual Preliminar
+
+| Entidade / Tabela | Atributo | Descrição | Regra / Observações |
+|-------------------|----------|-----------|----------------------|
+| **CLIENTE** | cpf_cnpj | Identificador natural do cliente | **Chave Primária (PK)**, único e sem máscara |
+| **CLIENTE** | nome | Nome do cliente | Campo obrigatório |
+| **CLIENTE** | sobrenome | Sobrenome do cliente | Campo obrigatório |
+| **CLIENTE** | telefone | Telefone de contato principal | |
+| **CLIENTE** | email | E-mail do cliente | |
+| **CLIENTE** | rua | Endereço (Rua) | |
+| **CLIENTE** | cep | Código de Endereçamento Postal | |
+| **ORÇAMENTO** | codigo_orcamento | Código do orçamento gerado | **Chave Primária (PK)** |
+| **ORÇAMENTO** | cpf_cnpj | Cliente que solicitou o orçamento | **Chave Estrangeira (FK)** → CLIENTE |
+| **ORÇAMENTO** | data | Data de emissão | |
+| **ORÇAMENTO** | valor_total | Valor final orçado | |
+| **ORÇAMENTO** | prazo_entrega | Prazo estipulado para entrega | |
+| **ORÇAMENTO** | status | Situação da negociação | Ex: Aprovado, Recusado, Pendente |
+| **ORÇAMENTO** | desconto_aplicado | Valor ou percentual de desconto | **RN10/RN13:** Limite de 3% a 10%, exige autorização |
+| **ORÇAMENTO** | prazo_validade | Data limite da oferta | **RN09:** Orçamentos possuem validade |
+| **CONTRATO** | codigo_contrato | Número de registro do contrato | **Chave Primária (PK)** |
+| **CONTRATO** | codigo_orcamento | Orçamento que gerou o contrato | **Chave Estrangeira (FK)** → ORÇAMENTO |
+| **CONTRATO** | data_inicio | Data da assinatura/início | |
+| **CONTRATO** | data_termino | Data de conclusão acordada | |
+| **CONTRATO** | valor | Valor fechado no contrato | |
+| **CONTRATO** | forma_pagamento | Modalidade financeira acordada | |
+| **CONTRATO** | status | Situação do contrato | Ex: Ativo, Cancelado, Finalizado |
+| **CONTRATO** | percentual_sinal | Valor de entrada | **RN01:** Exige no mínimo 30% de sinal |
+| **SERVIÇO** | id_servico | Identificador do serviço | **Chave Primária (PK)** |
+| **SERVIÇO** | tipo_servico | Categoria (Ex: Portão, Grade) | |
+| **SERVIÇO** | valor | Preço base de execução | |
+| **SERVIÇO** | prazo_entrega | Tempo estipulado em dias | |
+| **SERVIÇO** | descricao | Detalhamento do serviço | |
+| **SERVIÇO** | status | Fase atual de execução | |
+| **PRODUTO** | codigo_produto | Identificador do material | **Chave Primária (PK)** |
+| **PRODUTO** | nome | Nome comercial do material | |
+| **PRODUTO** | tipo | Classificação (Ex: Barra, Chapa) | |
+| **PRODUTO** | material | Composição (Ex: Aço, Alumínio) | |
+| **PRODUTO** | descricao | Especificação técnica | |
+| **PRODUTO** | unidade_medida | Métrica (Kg, Metro, Unidade) | |
+| **PRODUTO** | preco | Preço unitário base | |
+| **ESTOQUE** | codigo_produto | Referência do material guardado | **Chave Estrangeira (FK)** → PRODUTO |
+| **ESTOQUE** | quantidade_atual | Quantidade física no momento | |
+| **ESTOQUE** | quantidade_minima | Gatilho para nova compra | Política: Não deixar zerar |
+| **FORNECEDOR** | id_fornecedor | Identificador do fornecedor | **Chave Primária (PK)** |
+| **FORNECEDOR** | nome | Razão social ou nome fantasia | |
+| **FORNECEDOR** | cnpj | CNPJ do fornecedor | Único |
+| **FORNECEDOR** | telefone | Telefone comercial | |
+| **FORNECEDOR** | email | E-mail comercial | |
+| **FORNECEDOR** | endereco | Localização física | |
+| **FORNECEDOR** | tipo_material | Principal categoria fornecida | |
+| **PAGAMENTO** | id_pagamento | Identificador da transação | **Chave Primária (PK)** |
+| **PAGAMENTO** | codigo_contrato | Contrato que está sendo pago | **Chave Estrangeira (FK)** → CONTRATO |
+| **PAGAMENTO** | forma_pagamento | Como foi pago (Pix, TED, etc) | |
+| **PAGAMENTO** | data_pagamento | Data real da transação | |
+| **PAGAMENTO** | status | Estado da parcela | Ex: Pago, Aguardando |
+| **PAGAMENTO** | data_vencimento | Data limite combinada | |
+| **PAGAMENTO** | valor_pagamento | Valor exato desta transação | |
+| **FUNCIONÁRIO** | id_funcionario | Identificador do colaborador | **Chave Primária (PK)** |
+| **FUNCIONÁRIO** | nome | Primeiro nome | Campo obrigatório |
+| **FUNCIONÁRIO** | sobrenome | Sobrenome | |
+| **FUNCIONÁRIO** | cpf | CPF do colaborador | Único |
+| **FUNCIONÁRIO** | telefone | Telefone pessoal | |
+| **FUNCIONÁRIO** | cargo | Função (Ex: Soldador, Vendedor) | |
+| **FUNCIONÁRIO** | salario | Remuneração acordada | |
+| **FUNCIONÁRIO** | data_admissao | Quando iniciou na empresa | |
+| *(Associativa)* **contém** | id_contem | Identificador da relação | **Chave Primária (PK)** |
+| *(Associativa)* **contém** | codigo_orcamento | Qual orçamento | **Chave Estrangeira (FK)** |
+| *(Associativa)* **contém** | id_servico | Qual serviço | **Chave Estrangeira (FK)** |
+| *(Associativa)* **contém** | medidas | Dimensões solicitadas | |
+| *(Associativa)* **contém** | sub_total | Preço calculado para este item | |
+| *(Associativa)* **contém** | quantidade | Quantos serviços deste tipo | |
+| *(Associativa)* **Precisa** | id_precisa | Identificador da relação | **Chave Primária (PK)** |
+| *(Associativa)* **Precisa** | id_servico | Qual serviço | **Chave Estrangeira (FK)** |
+| *(Associativa)* **Precisa** | codigo_produto | Qual produto consumido | **Chave Estrangeira (FK)** |
+| *(Associativa)* **Precisa** | quantidade_necessaria | Total de material consumido | **RN12:** Gastos descontados do estoque |
+| *(Associativa)* **Executa** | id_executar | Identificador da relação | **Chave Primária (PK)** |
+| *(Associativa)* **Executa** | id_funcionario | Qual colaborador | **Chave Estrangeira (FK)** |
+| *(Associativa)* **Executa** | id_servico | Em qual serviço ele atuou | **Chave Estrangeira (FK)** |
 
 ---
 
