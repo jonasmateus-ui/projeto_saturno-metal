@@ -6,16 +6,17 @@
 
 ## 👥 Equipe
 
-| Nome | RA |
+| Nome | RGM |
 |------|----|
 | Jonas Mateus de Sousa de Araújo | 47252766 |
 | Marcos André Aragão da Cunha | 48229776 |
-| Marlon Dias De Sousa | — |
+| Marlon Dias De Sousa | 47621915 |
 | Murilo Souza dos Santos | 48108987 |
 | Eduardo Chaves Santos | 48043087 |
 | Guilherme Alves Raimundo | 48129861 |
 | Paulo Peralta Soto | 49760432 |
 | Daniel Santana Cavalcante | 47391812 |
+| Kaike Domingos Silva | 47963352 |
 | mateus candia neves coelho | 47390778 |
 
 ---
@@ -30,7 +31,7 @@ A **Space Metal** é uma empresa atuante no setor de **construção civil**, esp
 
 Escolhemos a Space Metal porque, mesmo sendo uma empresa que atua na construção civil e na serralheria, percebemos que a tecnologia pode melhorar bastante a produção deles.
 
-- **Processos para Análise:** A empresa possui um fluxo completo, que vai do orçamento inicial, passa pela compra de produtos, chega à fabricação e termina na instalação na obra. Esse passo a passo fornece bastante material para modelar.
+- **Processos pa Análise:** A empresa possui um fluxo completo, que vai do orçamento inicial, passa pela comp de produtos, chega à fabricação e termina na instalação na ob. Esse passo a passo fornece bastante material para modelar.
 - **Problemas na Organização das Informações:** Hoje a empresa tem dificuldade real em centralizar os dados. A equipe não se comunica bem, ainda usa controles manuais e a gestão de compras acaba gerando desperdício de material.
 - **Necessidade de Integração:** Eles precisam melhorar de forma urgente a comunicação entre a área que fecha os contratos e a oficina que executa o serviço. Essa integração é essencial para acabar com o retrabalho.
 - **Aplicação do Sistema ERP:** Com os problemas claros de gestão de estoque e de orçamentos, o cenário está ideal para implementar um sistema ERP que centralize tudo e automatize os registros de contratos e pagamentos da Space Metal.
