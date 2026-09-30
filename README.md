@@ -107,7 +107,7 @@ O DER abaixo reflete o modelo de dados final validado pela equipe, contendo toda
 
 | Entidade / Tabela | Atributo | Descrição | Regra / Observações |
 |-------------------|----------|-----------|----------------------|
-| **CLIENTE** | cpf_cnpj | Identificador natural do cliente | **Chave Primária (PK)**, único e sem máscara |
+| **CLIENTE** | cpf_cnpj | Identificador natural do cliente | **Chave Primária (PK)** e único|
 | **CLIENTE** | nome | Nome do cliente | Campo obrigatório |
 | **CLIENTE** | sobrenome | Sobrenome do cliente | Campo obrigatório |
 | **CLIENTE** | telefone | Telefone de contato principal | |
