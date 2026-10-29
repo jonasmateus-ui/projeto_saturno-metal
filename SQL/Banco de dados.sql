@@ -17,7 +17,7 @@ CREATE TABLE cliente (
                  CHECK (CHAR_LENGTH(cpf_cnpj) = 11 OR CHAR_LENGTH(cpf_cnpj) = 14),
     nome         VARCHAR(30)  NOT NULL, 
     sobrenome    VARCHAR(50)  NOT NULL, 
-    email        VARCHAR(60),          
+    email        VARCHAR(60)  NOT NULL,         
     cep          VARCHAR(9),
     rua          VARCHAR(60),          
     numero       VARCHAR(10),          
@@ -34,7 +34,7 @@ CREATE TABLE fornecedor (
     nome          VARCHAR(50)  NOT NULL, 
     cnpj          CHAR(14)     NOT NULL UNIQUE,
     telefone      VARCHAR(15),
-    email         VARCHAR(60),          
+    email         VARCHAR(60)  NOT NULL,          
     endereco      VARCHAR(80),          
     tipo_material VARCHAR(30)           
 );
