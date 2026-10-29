@@ -47,14 +47,14 @@ CREATE TABLE produto (
     material       VARCHAR(20),            
     descricao      VARCHAR(100),           
     unidade_medida VARCHAR(10)   NOT NULL,      
-    preco          DECIMAL(10,2) NOT NULL CHECK (preco >= 0)
+    preco          DECIMAL(10,2) NOT NULL CHECK (preco > 0)
 );
 
 
 CREATE TABLE servico (
     id_servico    INT AUTO_INCREMENT PRIMARY KEY,
     tipo_servico  VARCHAR(40)   NOT NULL,  
-    valor         DECIMAL(10,2) NOT NULL CHECK (valor >= 0),   
+    valor         DECIMAL(10,2) NOT NULL CHECK (valor > 0),   
     prazo_entrega INT          NOT NULL CHECK (prazo_entrega > 0), 
     descricao     VARCHAR(100),          
     status        VARCHAR(15)   NOT NULL DEFAULT 'ATIVO'
@@ -90,7 +90,7 @@ CREATE TABLE orcamento (
     codigo_orcamento  INT AUTO_INCREMENT PRIMARY KEY,
     cpf_cnpj          VARCHAR(14)   NOT NULL,
     data              DATE          NOT NULL,
-    valor_total       DECIMAL(10,2) NOT NULL CHECK (valor_total >= 0),
+    valor_total       DECIMAL(10,2) NOT NULL CHECK (valor_total > 0),
     prazo_entrega     INT           NOT NULL CHECK (prazo_entrega > 0),   
     status            VARCHAR(15)   NOT NULL DEFAULT 'PENDENTE'
                       CHECK (status IN ('PENDENTE','APROVADO','RECUSADO')),
@@ -146,7 +146,7 @@ CREATE TABLE pedido_compra (
     data_pedido      DATE          NOT NULL,
     previsao_entrega DATE,
     data_recebimento DATE,
-    valor_total      DECIMAL(10,2) NOT NULL CHECK (valor_total >= 0),
+    valor_total      DECIMAL(10,2) NOT NULL CHECK (valor_total > 0),
     status           VARCHAR(15)   NOT NULL DEFAULT 'EMITIDO' 
                      CHECK (status IN ('EMITIDO','RECEBIDO','CANCELADO')),
 
@@ -163,7 +163,7 @@ CREATE TABLE servico_contratado (
     id_servico            INT           NOT NULL,
     medidas               VARCHAR(40),  
     quantidade            INT           NOT NULL CHECK (quantidade > 0),
-    valor_acordado        DECIMAL(10,2) NOT NULL CHECK (valor_acordado >= 0),
+    valor_acordado        DECIMAL(10,2) NOT NULL CHECK (valor_acordado > 0),
     status_execucao       VARCHAR(20)   NOT NULL DEFAULT 'PENDENTE'
                           CHECK (status_execucao IN ('PENDENTE','EM_FABRICACAO','EM_INSTALACAO','CONCLUIDO','CANCELADO')),
     data_inicio           DATE,
@@ -232,7 +232,7 @@ CREATE TABLE contem (
 codigo_orcamento INT           NOT NULL,
 id_servico       INT           NOT NULL,
 medidas          VARCHAR(40),  
-sub_total        DECIMAL(10,2) NOT NULL CHECK (sub_total >= 0),
+sub_total        DECIMAL(10,2) NOT NULL CHECK (sub_total > 0),
 quantidade       INT           NOT NULL CHECK (quantidade > 0),
 PRIMARY KEY (codigo_orcamento, id_servico),
 CONSTRAINT fk_contem_orcamento FOREIGN KEY (codigo_orcamento) REFERENCES orcamento(codigo_orcamento) ON DELETE CASCADE,
