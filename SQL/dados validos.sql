@@ -1,110 +1,115 @@
--- CLIENTE (Nomes, sobrenomes, logradouros e e-mails compactos dentro dos novos limites de 30, 40 e 60)
-INSERT INTO cliente (cpf_cnpj, nome, sobrenome, email, cep, rua, numero, complemento, bairro, cidade, uf, ddd, telefone) VALUES 
-('11122233344', 'Ana', 'Silva', 'ana.silva@uol.com', '03314-000', 'R. Tuiuti', '1500', 'Ap 42', 'Tatuape', 'Sao Paulo', 'SP', '11', '988887777'),
-('22233344455', 'Bruno', 'Mendes', 'bruno.m@gme.com', '03047-000', 'Av. C. Garcia', '2500', 'Bl 2', 'Bras', 'Sao Paulo', 'SP', '11', '966665555');
+USE Space_Metal;
 
--- FORNECEDOR (Nomes fantasia e endereços enxutos respeitando os limites de 50 e 80)
-INSERT INTO fornecedor (nome, cnpj, telefone, email, endereco, tipo_material) VALUES 
-('Gerdau Comercial', '11222333000144', '1133334444', 'vendas@gerdau.com', 'Av. Ind, 450', 'Ferro e Aco'),
-('Alu Central', '55666777000188', '1144445555', 'comercial@aluc.com', 'R. Juntas, 50', 'Aluminio');
+-- =====================================================================
+-- 1. ENTIDADES INDEPENDENTES
+-- =====================================================================
 
--- PRODUTO (Nomes técnicos curtos dentro do limite de 50)
-INSERT INTO produto (nome, tipo, material, descricao, unidade_medida, preco) VALUES 
-('Tubo Quad 40x40 2mm', 'Tubo', 'Aco', 'Tubo de aco carbono quadrado de 40x40mm', 'M', 45.50),
-('Barra Chata 1/2 x 1/8', 'Barra', 'Aluminio', 'Barra chata de aluminio natural 6m', 'UN', 25.00);
+-- Clientes
+INSERT INTO cliente (cpf_cnpj, nome, sobrenome, email, cep, rua, numero, complemento, bairro, cidade, uf, ddd, telefone) VALUES
+('12345678901', 'Carlos', 'Silveira', 'carlos.silveira@email.com', '01310-100', 'Avenida Paulista', '1000', 'Apto 42', 'Bela Vista', 'São Paulo', 'SP', '11', '987654321'),
+('98765432109', 'Ana', 'Souza', 'ana.souza@email.com', '04551-010', 'Rua Funchal', '250', 'Bloco B', 'Vila Olímpia', 'São Paulo', 'SP', '11', '912345678');
 
--- SERVIÇO (Tipos de serviço resumidos em até 40 caracteres)
-INSERT INTO servico (tipo_servico, valor, prazo_entrega, descricao, status) VALUES 
-('Portao Basculante', 2500.00, 15, 'Portao residencial em aco com requadro', 'ATIVO'),
-('Grade de Protecao', 350.00, 7, 'Grade para janela sob medida por m2', 'ATIVO');
+-- Fornecedores (Com endereço completo e DDD)
+INSERT INTO fornecedor (nome, cnpj, telefone, ddd, email, cep, rua, numero, complemento, bairro, cidade, uf, tipo_material) VALUES
+('Metalurgica Ferros Ind', '12345678000199', '33334444', '11', 'contato@ferrosind.com.br', '03102-000', 'Rua dos Aços', '120', 'Galpão A', 'Mooca', 'São Paulo', 'SP', 'Perfis de Aço'),
+('Parafusos & Cia', '98765432000188', '55556666', '11', 'vendas@parafusoscia.com.br', '04280-020', 'Rua das Porcas', '45', NULL, 'Ipiranga', 'São Paulo', 'SP', 'Fixadores');
 
--- FUNCIONÁRIO (Primeiro nome em até 20 e sobrenome em até 40 caracteres)
-INSERT INTO funcionario (nome, sobrenome, cpf, telefone, cargo, salario, data_admissao) VALUES 
-('Jorge', 'Santos', '12345678901', '11977776666', 'Soldador', 2800.00, '2026-01-15'),
-('Mariana', 'Costa', '98765432100', '11966665555', 'Vendedor', 2200.00, '2026-03-01');
+-- Produtos (Matérias-primas e itens de estoque)
+INSERT INTO produto (codigo_produto, nome, tipo, material, descricao, unidade_medida, preco) VALUES
+(1, 'Perfil Tubular Aço 50x30', 'Matéria-Prima', 'Aço Carbono', 'Barra de 6 metros', 'UN', 150.00),
+(2, 'Chapa de Aço Galv. 2mm', 'Matéria-Prima', 'Aço Galvanizado', 'Chapa 2x1 metro', 'UN', 280.00),
+(3, 'Parafuso Sextavado 3/8', 'Insumo', 'Aço Inox', 'Caixa com 100 unidades', 'CX', 45.00);
 
--- LANÇAMENTO_EXTRATO (Contas bancárias e descrições curtas)
-INSERT INTO lancamento_extrato (conta_bancaria, data, descricao, valor, tipo) VALUES 
-('Ag1234 CC5678', '2026-10-20', 'PIX RECEBIDO ANA SILVA', 1050.00, 'CREDITO'),
-('Ag1234 CC5678', '2026-10-22', 'TED PAGA GERDAU', 1500.00, 'DEBITO');
--- ORÇAMENTO
-INSERT INTO orcamento (cpf_cnpj, data, valor_total, prazo_entrega, status, desconto_aplicado, prazo_validade) VALUES 
-('11122233344', '2026-10-01', 3500.00, 15, 'APROVADO', 5.00, '2026-10-16'),
-('22233344455', '2026-10-10', 1200.00, 10, 'PENDENTE', 0.00, '2026-10-25');
+-- Estoque inicial (Vinculado aos produtos e fornecedores)
+INSERT INTO estoque (codigo_produto, id_fornecedor, quantidade_atual, quantidade_minima) VALUES
+(1, 1, 50.00, 10.00),
+(2, 1, 20.00, 5.00),
+(3, 2, 100.00, 20.00);
 
--- CONTRATO (Formas de pagamento curtas de até 20 caracteres)
-INSERT INTO contrato (codigo_orcamento, data_inicio, data_termino, valor, forma_pagamento, status, percentual_sinal) VALUES 
-(1, '2026-10-05', '2026-10-20', 3500.00, 'Pix', 'ATIVO', 30.00),
-(2, '2026-10-12', '2026-10-22', 1200.00, 'Boleto', 'ATIVO', 50.00);
+-- Serviços oferecidos pela Serralheria
+INSERT INTO servico (id_servico, tipo_servico, valor, prazo_entrega, descricao, status) VALUES
+(1, 'Fabricação de Portão Basculante', 2500.00, 15, 'Portão em aço com pintura anticorrosiva', 'ATIVO'),
+(2, 'Instalação de Grade de Proteção', 800.00, 5, 'Grades para janelas residenciais', 'ATIVO');
 
--- SERVICO_CONTRATADO (Medidas enxutas em até 40 caracteres)
-INSERT INTO servico_contratado (codigo_contrato, id_servico, medidas, quantidade, valor_acordado, status_execucao, data_inicio, data_conclusao) VALUES 
-(1, 1, '2.5x3.0m', 1, 3500.00, 'EM_FABRICACAO', '2026-10-06', NULL),
-(2, 2, '1.2x1.5m', 2, 1200.00, 'PENDENTE', NULL, NULL);
+-- Funcionários
+INSERT INTO funcionario (nome, sobrenome, cpf, telefone, ddd, cargo, salario, data_admissao) VALUES
+('Marcos', 'Oliveira', '11122233344', '998877665', '11', 'Serralheiro', 3500.00, '2023-02-10'),
+('Juliana', 'Santos', '22233344455', '988776654', '11', 'Auxiliar de Produção', 2200.00, '2023-06-15');
 
--- PAGAMENTO
-INSERT INTO pagamento (codigo_contrato, forma_pagamento, data_pagamento, status, data_vencimento, valor_pagamento) VALUES 
-(1, 'Pix', '2026-10-05', 'PAGO', '2026-10-05', 1050.00), -- 30% sinal do Contrato 1
-(1, 'Pix', NULL, 'AGUARDANDO', '2026-10-20', 2450.00), -- Saldo do Contrato 1
-(2, 'Boleto', '2026-10-12', 'PAGO', '2026-10-12', 600.00), -- 50% sinal do Contrato 2
-(2, 'Boleto', NULL, 'AGUARDANDO', '2026-10-22', 600.00); -- Saldo do Contrato 2
+-- Lançamentos em extrato bancário
+INSERT INTO lancamento_extrato (conta_bancaria, data, descricao, valor, tipo) VALUES
+('Banco Itaú - CC 12345-6', '2026-05-01', 'Recebimento Sinal Cliente Carlos', 750.00, 'CREDITO'),
+('Banco Itaú - CC 12345-6', '2026-05-03', 'Pagamento Fornecedor Ferros Ind', 1500.00, 'DEBITO');
 
--- ESTOQUE (1:1 rigoroso com a Chave Primária correta)
-INSERT INTO estoque (codigo_produto, quantidade_atual, quantidade_minima) VALUES 
-(1, 50.00, 10.00),
-(2, 15.00, 20.00);
 
--- COTAÇÃO (Condições de pagamento curtas de até 40 caracteres)
-INSERT INTO cotacao (id_fornecedor, data_cotacao, prazo_entrega, condicao_pagamento, validade, status) VALUES 
-(1, '2026-10-10', 3, 'Boleto 15 dias', '2026-10-17', 'ACEITA'),
-(2, '2026-10-11', 5, 'A vista', '2026-10-15', 'EXPIRADA');
+-- =====================================================================
+-- 2. ENTIDADES DEPENDENTES
+-- =====================================================================
 
--- PEDIDO_COMPRA
-INSERT INTO pedido_compra (id_cotacao, data_pedido, previsao_entrega, data_recebimento, valor_total, status) VALUES 
-(1, '2026-10-12', '2026-10-15', '2026-10-15', 1500.00, 'RECEBIDO'),
-(2, '2026-10-14', '2026-10-19', NULL, 800.00, 'EMITIDO');
+-- Orçamento (Status APROVADO para permitir a criação do contrato respeitando a RN04)
+INSERT INTO orcamento (codigo_orcamento, cpf_cnpj, data, valor_total, prazo_entrega, status, desconto_aplicado, prazo_validade) VALUES
+(1, '12345678901', '2026-04-25', 2500.00, 15, 'APROVADO', 0.00, '2026-05-25');
 
--- CONTA_PAGAR
-INSERT INTO conta_pagar (id_pedido_compra, numero_parcela, valor_previsto, data_vencimento, status) VALUES 
-(1, 1, 1500.00, '2026-10-27', 'PAGA'),
-(2, 1, 800.00, '2026-11-14', 'ABERTA');
+-- Contrato (Gerado a partir de um orçamento APROVADO)
+INSERT INTO contrato (codigo_contrato, codigo_orcamento, data_inicio, data_termino, valor, forma_pagamento, status, percentual_sinal) VALUES
+(1, 1, '2026-05-01', '2026-05-16', 2500.00, 'Pix', 'ATIVO', 30.00);
 
--- MOVIMENTAÇÃO_ESTOQUE
-INSERT INTO movimentacao_estoque (codigo_produto, id_servico_contratado, id_pedido_compra, tipo, quantidade, data_movimentacao) VALUES 
-(1, NULL, 1, 'ENTRADA', 30.00, '2026-10-15 14:30:00'),
-(1, 1, NULL, 'SAIDA', 12.00, '2026-10-16 08:00:00');
+-- Cotação com fornecedor
+INSERT INTO cotacao (id_cotacao, id_fornecedor, data_cotacao, prazo_entrega, condicao_pagamento, validade, status) VALUES
+(1, 1, '2026-04-20', 3, '30 dias', '2026-05-20', 'ACEITA');
 
--- MOVIMENTAÇÃO_CAIXA
-INSERT INTO movimentacao_caixa (id_pagamento, id_conta_pagar, tipo, data_movimento, valor, forma_pagamento) VALUES 
-(1, NULL, 'ENTRADA', '2026-10-05', 1050.00, 'Pix'),
-(NULL, 1, 'SAIDA', '2026-10-22', 1500.00, 'Boleto');
+-- Pedido de Compra (Vinculado à cotação aceita)
+INSERT INTO pedido_compra (id_pedido_compra, id_cotacao, data_pedido, previsao_entrega, data_recebimento, valor_total, status) VALUES
+(1, 1, '2026-04-21', '2026-04-24', '2026-04-24', 1500.00, 'RECEBIDO');
 
--- CONCILIACAO (Observações resumidas em até 150 caracteres)
-INSERT INTO conciliacao (id_lancamento, id_mov_caixa, data_conciliacao, status, observacao) VALUES 
-(1, 1, '2026-10-20', 'CONCILIADO', 'Pix de sinal recebido verificado no extrato bancario.'),
-(2, 2, '2026-10-22', 'CONCILIADO', 'Pagamento de boleto a fornecedor compensado.');
+-- Serviço Contratado (Vinculado ao contrato e serviço)
+-- NOTA: Mantido como 'PENDENTE' inicialmente. A trigger só permite mudar para 'EM_FABRICACAO' se houver pagamento PAGO.
+INSERT INTO servico_contratado (id_servico_contratado, codigo_contrato, id_servico, medidas, quantidade, valor_acordado, status_execucao, data_inicio, data_conclusao) VALUES
+(1, 1, '1', '3.00m x 2.10m', 1, 2500.00, 'PENDENTE', NULL, NULL);
 
--- CONTEM (Orçamentos com itens detalhados de forma compacta)
-INSERT INTO contem (codigo_orcamento, id_servico, medidas, sub_total, quantidade) VALUES 
-(1, 1, '2.5x3.0m', 2500.00, 1),
-(1, 2, '1.2x1.5m', 1000.00, 3);
+-- Pagamento (Registra o sinal de 30% pago, o que desbloqueará a trigger de produção se necessário)
+INSERT INTO pagamento (id_pagamento, codigo_contrato, forma_pagamento, data_pagamento, status, data_vencimento, valor_pagamento) VALUES
+(1, 1, 'Pix', '2026-05-01', 'PAGO', '2026-05-01', 750.00);
 
--- PRECISA (Ficha técnica de consumo de material por serviço)
-INSERT INTO precisa (id_servico, codigo_produto, quantidade_necessaria) VALUES 
-(1, 1, 18.50),
-(2, 2, 4.00);
+-- Contas a Pagar (Vinculado ao pedido de compra)
+INSERT INTO conta_pagar (id_conta_pagar, id_pedido_compra, numero_parcela, valor_previsto, data_vencimento, status) VALUES
+(1, 1, 1, 1500.00, '2026-05-21', 'PAGA');
 
--- EXECUTA (Vincula funcionários à execução das obras)
-INSERT INTO executa (id_funcionario, id_servico_contratado) VALUES 
-(1, 1),
-(1, 2);
+-- Movimentação de Estoque (Respeita a RN20: ENTRADA exige id_pedido_compra)
+INSERT INTO movimentacao_estoque (codigo_produto, id_servico_contratado, id_pedido_compra, tipo, quantidade) VALUES
+(1, NULL, 1, 'ENTRADA', 10.00);
 
--- ITEM_COTAÇÃO
-INSERT INTO item_cotacao (id_cotacao, codigo_produto, quantidade, preco_unitario) VALUES 
-(1, 1, 30.00, 50.00),
-(2, 2, 10.00, 25.00);
+-- Movimentação de Caixa
+INSERT INTO movimentacao_caixa (id_pagamento, id_conta_pagar, tipo, data_movimento, valor, forma_pagamento) VALUES
+(1, NULL, 'ENTRADA', '2026-05-01', 750.00, 'Pix'),
+(NULL, 1, 'SAIDA', '2026-05-03', 1500.00, 'Boleto');
 
--- ITEM_PEDIDO_COMPRA
-INSERT INTO item_pedido_compra (id_pedido_compra, codigo_produto, quantidade, preco_unitario) VALUES 
-(1, 1, 30.00, 50.00),
-(2, 2, 10.00, 25.00);
+
+-- =====================================================================
+-- 3. ENTIDADES ASSOCIATIVAS (Relacionamentos N:N)
+-- =====================================================================
+
+-- Serviços contidos no orçamento
+INSERT INTO contem (codigo_orcamento, id_servico, medidas, sub_total, quantidade) VALUES
+(1, 1, '3.00m x 2.10m', 2500.00, 1);
+
+-- Produtos necessários para realizar o serviço
+INSERT INTO precisa (id_servico, codigo_produto, quantidade_necessaria) VALUES
+(1, 1, 4.00), -- 4 barras de perfil tubular
+(1, 3, 2.00); -- 2 caixas de parafusos
+
+-- Funcionários que executam o serviço contratado
+INSERT INTO executa (id_funcionario, id_servico_contratado) VALUES
+(1, 1); -- Funcionário Marcos executa o serviço 1
+
+-- Itens da cotação
+INSERT INTO item_cotacao (id_cotacao, codigo_produto, quantidade, preco_unitario) VALUES
+(1, 1, 10.00, 150.00);
+
+-- Itens do pedido de compra
+INSERT INTO item_pedido_compra (id_pedido_compra, codigo_produto, quantidade, preco_unitario) VALUES
+(1, 1, 10.00, 150.00);
+
+-- Conciliação bancária
+INSERT INTO conciliacao (id_lancamento, id_mov_caixa, data_conciliacao, status, observacao) VALUES
+(1, 1, '2026-05-02', 'CONCILIADO', 'Conciliado com extrato bancário do Itaú');

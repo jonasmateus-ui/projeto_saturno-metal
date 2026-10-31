@@ -34,8 +34,15 @@ CREATE TABLE fornecedor (
     nome          VARCHAR(50)  NOT NULL, 
     cnpj          CHAR(14)     NOT NULL UNIQUE,
     telefone      VARCHAR(15),
+    ddd           VARCHAR(2)   NOT NULL,
     email         VARCHAR(60)  NOT NULL,          
-    endereco      VARCHAR(80),          
+    cep           VARCHAR(9),
+    rua           VARCHAR(60),          
+    numero        VARCHAR(10),          
+    complemento   VARCHAR(30),          
+    bairro        VARCHAR(40),          
+    cidade        VARCHAR(40),          
+    uf            CHAR(2),          
     tipo_material VARCHAR(30)           
 );
 
@@ -67,6 +74,7 @@ CREATE TABLE funcionario (
     sobrenome      VARCHAR(40),            
     cpf            CHAR(11)      NOT NULL UNIQUE,
     telefone       VARCHAR(15),
+    ddd            VARCHAR(2)   NOT NULL,
     cargo          VARCHAR(30)   NOT NULL, 
     salario        DECIMAL(10,2) NOT NULL CHECK (salario > 0),
     data_admissao  DATE          NOT NULL
@@ -93,7 +101,7 @@ CREATE TABLE orcamento (
     valor_total       DECIMAL(10,2) NOT NULL CHECK (valor_total > 0),
     prazo_entrega     INT           NOT NULL CHECK (prazo_entrega > 0),   
     status            VARCHAR(15)   NOT NULL DEFAULT 'PENDENTE'
-                      CHECK (status IN ('PENDENTE','APROVADO','RECUSADO')),
+                      CHECK (status IN ('PENDENTE','APROVADO','RECUSADO', 'EXPIRADO')),
     desconto_aplicado DECIMAL(5,2)  NOT NULL DEFAULT 0.00
                       CHECK (desconto_aplicado BETWEEN 0 AND 10),         
     prazo_validade    DATE,                                               
@@ -120,10 +128,12 @@ CREATE TABLE contrato (
 
 CREATE TABLE estoque (
     codigo_produto    INT PRIMARY KEY,
+    id_fornecedor INT,
     quantidade_atual  DECIMAL(10,2) NOT NULL DEFAULT 0 CHECK (quantidade_atual >= 0),
     quantidade_minima DECIMAL(10,2) NOT NULL CHECK (quantidade_minima > 0),  
 
-    CONSTRAINT fk_estoque_produto FOREIGN KEY (codigo_produto) REFERENCES produto(codigo_produto) ON DELETE CASCADE
+    CONSTRAINT fk_estoque_produto FOREIGN KEY (codigo_produto) REFERENCES produto(codigo_produto) ON DELETE CASCADE,
+    CONSTRAINT fk_estoque_fornecedor FOREIGN KEY (id_fornecedor) REFERENCES fornecedor(id_fornecedor) ON DELETE SET NULL
 );
 
 CREATE TABLE cotacao (
@@ -294,6 +304,76 @@ CONSTRAINT fk_concil_lancamento FOREIGN KEY (id_lancamento) REFERENCES lancament
 CONSTRAINT fk_concil_movcaixa   FOREIGN KEY (id_mov_caixa)  REFERENCES movimentacao_caixa(id_mov_caixa) ON DELETE CASCADE,
 INDEX idx_concil_movcaixa (id_mov_caixa)
 );
+
+DELIMITER //
+
+-- =====================================================================
+-- 1. RN04: Orçamento só vira contrato se estiver APROVADO
+-- =====================================================================
+CREATE TRIGGER trg_valida_status_orcamento
+BEFORE INSERT ON contrato
+FOR EACH ROW
+BEGIN
+    DECLARE v_status VARCHAR(15);
+
+    SELECT status INTO v_status
+    FROM orcamento
+    WHERE codigo_orcamento = NEW.codigo_orcamento;
+
+    IF v_status IS NULL OR v_status <> 'APROVADO' THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Erro (RN04): O orçamento precisa estar APROVADO para gerar um contrato.';
+    END IF;
+END;
+//
+
+-- =====================================================================
+-- 2. RN20: ENTRADA exige pedido de compra / SAÍDA exige serviço contratado
+-- =====================================================================
+CREATE TRIGGER trg_valida_movimentacao_estoque
+BEFORE INSERT ON movimentacao_estoque
+FOR EACH ROW
+BEGIN
+    IF NEW.tipo = 'ENTRADA' AND NEW.id_pedido_compra IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Erro (RN20): Movimentação de ENTRADA exige um id_pedido_compra.';
+    END IF;
+
+    IF NEW.tipo = 'SAIDA' AND NEW.id_servico_contratado IS NULL THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Erro (RN20): Movimentação de SAÍDA exige um id_servico_contratado.';
+    END IF;
+END;
+//
+
+-- =====================================================================
+-- 3. RN01 / RF13: Sinal mínimo de 30% pago antes da produção
+-- Impede mudar o status de execução para 'EM_FABRICACAO' se não houver pagamento PAGO
+-- =====================================================================
+CREATE TRIGGER trg_valida_sinal_producao
+BEFORE UPDATE ON servico_contratado
+FOR EACH ROW
+BEGIN
+    DECLARE v_pagamentos_pendentes INT;
+
+    -- Se o status está mudando para algo produtivo e antes estava pendente
+    IF NEW.status_execucao IN ('EM_FABRICACAO', 'EM_INSTALACAO') AND OLD.status_execucao = 'PENDENTE' THEN
+        
+        -- Verifica se existe parcela de sinal (ou pagamento associado ao contrato) que esteja 'PAGO'
+        SELECT COUNT(*) INTO v_pagamentos_pendentes
+        FROM pagamento
+        WHERE codigo_contrato = NEW.codigo_contrato 
+          AND status = 'PAGO';
+
+        IF v_pagamentos_pendentes = 0 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Erro (RN01/RF13): A produção não pode iniciar sem a confirmação do pagamento do sinal.';
+        END IF;
+    END IF;
+END;
+//
+
+DELIMITER ;
 
 -- =====================================================================
 -- PARTE 4 - SELECT PARA VISUALIZAR AS TABELAS
