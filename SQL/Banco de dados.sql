@@ -33,7 +33,7 @@ CREATE TABLE fornecedor (
     id_fornecedor INT AUTO_INCREMENT PRIMARY KEY,
     nome          VARCHAR(50)  NOT NULL, 
     cnpj          CHAR(14)     NOT NULL UNIQUE,
-    telefone      VARCHAR(15),
+    telefone      VARCHAR(9),
     ddd           VARCHAR(2)   NOT NULL,
     email         VARCHAR(60)  NOT NULL,          
     cep           VARCHAR(9),
@@ -133,7 +133,7 @@ CREATE TABLE estoque (
     quantidade_minima DECIMAL(10,2) NOT NULL CHECK (quantidade_minima > 0),  
 
     CONSTRAINT fk_estoque_produto FOREIGN KEY (codigo_produto) REFERENCES produto(codigo_produto) ON DELETE CASCADE,
-    CONSTRAINT fk_estoque_fornecedor FOREIGN KEY (id_fornecedor) REFERENCES fornecedor(id_fornecedor) ON DELETE SET NULL
+    CONSTRAINT fk_estoque_fornecedor FOREIGN KEY (id_fornecedor) REFERENCES fornecedor(id_fornecedor)
 );
 
 CREATE TABLE cotacao (
