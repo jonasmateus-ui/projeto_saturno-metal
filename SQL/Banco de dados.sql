@@ -403,3 +403,100 @@ SELECT * FROM executa;
 SELECT * FROM item_cotacao;
 SELECT * FROM item_pedido_compra;
 SELECT * FROM conciliacao;
+
+-- =====================================================================
+-- PARTE 5 - JOINS RELACIONAIS
+-- =====================================================================
+
+USE Space_Metal;
+
+-- 1. Orçamentos com cliente
+SELECT o.codigo_orcamento, c.nome, c.sobrenome, o.data, o.valor_total, o.status
+FROM orcamento o
+JOIN cliente c ON c.cpf_cnpj = o.cpf_cnpj;
+
+-- 2. Serviços de cada orçamento
+SELECT o.codigo_orcamento, s.tipo_servico, ct.medidas, ct.quantidade, ct.sub_total
+FROM contem ct
+JOIN orcamento o ON o.codigo_orcamento = ct.codigo_orcamento
+JOIN servico s ON s.id_servico = ct.id_servico;
+
+-- 3. Contratos com orçamento e cliente
+SELECT k.codigo_contrato, c.nome, c.sobrenome, k.valor, k.status
+FROM contrato k
+JOIN orcamento o ON o.codigo_orcamento = k.codigo_orcamento
+JOIN cliente c ON c.cpf_cnpj = o.cpf_cnpj;
+
+-- 4. Serviços contratados com contrato e serviço
+SELECT sc.id_servico_contratado, k.codigo_contrato, s.tipo_servico, sc.valor_acordado, sc.status_execucao
+FROM servico_contratado sc
+JOIN contrato k ON k.codigo_contrato = sc.codigo_contrato
+JOIN servico s ON s.id_servico = sc.id_servico;
+
+-- 5. Funcionários por serviço contratado
+SELECT f.nome, f.cargo, s.tipo_servico, sc.status_execucao
+FROM executa e
+JOIN funcionario f ON f.id_funcionario = e.id_funcionario
+JOIN servico_contratado sc ON sc.id_servico_contratado = e.id_servico_contratado
+JOIN servico s ON s.id_servico = sc.id_servico;
+
+-- 6. Materiais necessários por serviço
+SELECT s.tipo_servico, p.nome, pr.quantidade_necessaria
+FROM precisa pr
+JOIN servico s ON s.id_servico = pr.id_servico
+JOIN produto p ON p.codigo_produto = pr.codigo_produto;
+
+-- 7. Estoque com produto e fornecedor
+SELECT p.nome, e.quantidade_atual, e.quantidade_minima, f.nome AS fornecedor
+FROM estoque e
+JOIN produto p ON p.codigo_produto = e.codigo_produto
+LEFT JOIN fornecedor f ON f.id_fornecedor = e.id_fornecedor;
+
+-- 8. Pedido de compra com fornecedor e itens
+SELECT pc.id_pedido_compra, f.nome AS fornecedor, p.nome AS produto, i.quantidade, i.preco_unitario
+FROM pedido_compra pc
+JOIN cotacao ct ON ct.id_cotacao = pc.id_cotacao
+JOIN fornecedor f ON f.id_fornecedor = ct.id_fornecedor
+JOIN item_pedido_compra i ON i.id_pedido_compra = pc.id_pedido_compra
+JOIN produto p ON p.codigo_produto = i.codigo_produto;
+
+-- CONSULTAS GERENCIAIS
+-- 9. Quanto cada contrato já recebeu e o saldo a receber
+SELECT k.codigo_contrato, k.valor,
+SUM(CASE WHEN p.status = 'PAGO' THEN p.valor_pagamento ELSE 0 END) AS recebido,
+k.valor - SUM(CASE WHEN p.status = 'PAGO' THEN p.valor_pagamento ELSE 0 END) AS saldo
+FROM contrato k
+LEFT JOIN pagamento p ON p.codigo_contrato = k.codigo_contrato
+GROUP BY k.codigo_contrato, k.valor;
+
+-- 10. Produtos com estoque no mínimo ou abaixo (esperado: nenhuma lista)
+SELECT p.nome, e.quantidade_atual, e.quantidade_minima
+FROM estoque e
+JOIN produto p ON p.codigo_produto = e.codigo_produto
+WHERE e.quantidade_atual <= e.quantidade_minima;
+
+-- 11. Total comprado por fornecedor
+SELECT f.nome, COUNT(pc.id_pedido_compra) AS pedidos, SUM(pc.valor_total) AS total
+FROM fornecedor f
+JOIN cotacao ct ON ct.id_fornecedor = f.id_fornecedor
+JOIN pedido_compra pc ON pc.id_cotacao = ct.id_cotacao
+GROUP BY f.id_fornecedor, f.nome;
+
+-- CONSULTAS DE AUDITORIA (esperado: nenhuma linha)
+-- 12. Orçamento aprovado sem contrato
+SELECT o.codigo_orcamento
+FROM orcamento o
+LEFT JOIN contrato k ON k.codigo_orcamento = o.codigo_orcamento
+WHERE o.status = 'APROVADO' AND k.codigo_contrato IS NULL;
+
+-- 13. Serviço contratado sem funcionário
+SELECT sc.id_servico_contratado
+FROM servico_contratado sc
+LEFT JOIN executa e ON e.id_servico_contratado = sc.id_servico_contratado
+WHERE e.id_funcionario IS NULL;
+
+-- 14. Movimentação de caixa sem conciliação (mostra movimentações que ainda não foram conciliadas, esperada: 1)
+SELECT mc.id_mov_caixa, mc.tipo, mc.valor
+FROM movimentacao_caixa mc
+LEFT JOIN conciliacao cc ON cc.id_mov_caixa = mc.id_mov_caixa
+WHERE cc.id_lancamento IS NULL;
